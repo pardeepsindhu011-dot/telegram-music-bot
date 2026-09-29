@@ -1,4 +1,4 @@
-
+from music_service import search_music
 import os
 from config import ADMIN_ID
 from dotenv import load_dotenv
