@@ -26,25 +26,52 @@ TOKEN =os.getenv("BOT_TOKEN")
 
 CHOOSING_LANGUAGE = 1
 WAITING_FOR_SONG = 2
-
-
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
 
     keyboard = [
         [
-            InlineKeyboardButton("🇮🇳 Hindi", callback_data="hindi"),
-            InlineKeyboardButton("🇬🇧 English", callback_data="english")
+            InlineKeyboardButton(
+                "🎤 Popular Singers",
+                callback_data="popular_singers"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "🔎 Search Music",
+                callback_data="search_music"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "🔥 Trending",
+                callback_data="trending"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "❤️ Favorites",
+                callback_data="favorites"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "ℹ️ Help",
+                callback_data="help"
+            )
         ]
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     await update.message.reply_text(
-        "🎵 Welcome to Music Finder!\n\n"
-        "Choose a language:",
-        reply_markup=reply_markup
+        "🎵 *Welcome to Music Bot!*\n\n"
+        "What would you like to do?",
+        reply_markup=reply_markup,
+        parse_mode="Markdown"
     )
-    return CHOOSING_LANGUAGE
 
 
 async def language_selected(
@@ -196,6 +223,47 @@ async def weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Temperature: {temperature} °C\n"
         f"Wind speed: {wind_speed} km/h"
     )
+async def home_button(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    query = update.callback_query
+
+    await query.answer()
+
+    if query.data == "popular_singers":
+        await query.edit_message_text(
+            "🎤 Popular Singers\n\n"
+            "Coming next: singer selection 🎶"
+        )
+
+    elif query.data == "search_music":
+        await query.edit_message_text(
+            "🔎 Search Music\n\n"
+            "Type the singer or song name."
+        )
+
+    elif query.data == "trending":
+        await query.edit_message_text(
+            "🔥 Trending\n\n"
+            "Trending songs will appear here soon."
+        )
+
+    elif query.data == "favorites":
+        await query.edit_message_text(
+            "❤️ Favorites\n\n"
+            "Your saved songs will appear here."
+        )
+
+    elif query.data == "help":
+        await query.edit_message_text(
+            "ℹ️ Help\n\n"
+            "🎤 Choose a singer\n"
+            "🔎 Search for music\n"
+            "🔥 Explore trending songs\n"
+            "❤️ Save your favorite songs"
+        )
 conversation_handler = ConversationHandler(
 
     entry_points=[
@@ -229,6 +297,7 @@ create_database()
 app = Application.builder().token(TOKEN).build()
 
 app.add_handler(conversation_handler)
+app.add_handler(CallbackQueryHandler(home_button))
 app.add_handler(CommandHandler("weather", weather))
 app.add_handler(CommandHandler("admin", admin))
 app.add_handler(CommandHandler("broadcast", broadcast))
@@ -236,6 +305,7 @@ app.add_handler(CommandHandler("stats", stats))
 app.add_handler(CommandHandler("users", users))
 app.add_handler(CommandHandler("remind", remind))
 app.add_handler(CommandHandler("notify", notify))
+
 app.job_queue.run_repeating(
     monitor_database,
     interval=60,
