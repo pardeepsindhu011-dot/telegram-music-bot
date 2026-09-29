@@ -78,7 +78,6 @@ async def language_selected(
 
     return WAITING_FOR_SONG
 
-
 async def search_text(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
@@ -86,9 +85,36 @@ async def search_text(
 
     user_text = update.message.text
 
-    await update.message.reply_text(
-        f"You searched for: {user_text}"
-    )
+    try:
+
+        results = search_music(user_text)
+
+        if not results:
+            await update.message.reply_text(
+                "❌ No music results found."
+            )
+            return ConversationHandler.END
+
+        message = "🎵 Music Results\n\n"
+
+        for number, result in enumerate(results, start=1):
+
+            message += (
+                f"{number}. {result['song']}\n"
+                f"Artist: {result['artist']}\n"
+                f"Album: {result['album']}\n"
+                f"🔗 {result['link']}\n\n"
+            )
+
+        await update.message.reply_text(message)
+
+    except Exception as error:
+
+        print("Music search error:", error)
+
+        await update.message.reply_text(
+            "❌ Sorry, I couldn't search for music right now."
+        )
 
     return ConversationHandler.END
 
