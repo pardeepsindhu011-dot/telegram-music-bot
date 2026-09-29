@@ -5,8 +5,6 @@ from database import (
     get_user_count,
     get_users
 )
-from music_service import search_music
-
 from telegram import Update
 from telegram.ext import ContextTypes
 
