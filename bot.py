@@ -280,6 +280,77 @@ async def home_button(
         reply_markup=reply_markup,
         parse_mode="Markdown"
     )
+    elif query.data.startswith("singer_"):
+
+        singer_names = {
+            "singer_arijit": "Arijit Singh",
+            "singer_Dhanda": "Dhanda Nyoli",
+            "singer_KDharyanvi": "KD haryanvi",
+            "singer_ed": "Ed Sheeran",
+            "singer_weeknd": "The Weeknd",
+            "singer_bruno": "Bruno Mars"
+        }
+
+        singer = singer_names.get(query.data)
+
+        if not singer:
+            await query.edit_message_text(
+                "❌ Singer not found."
+            )
+            return
+
+        await query.edit_message_text(
+            f"🎤 {singer}\n\n"
+            "🔎 Searching popular songs..."
+        )
+
+        try:
+
+            results = search_music(singer)
+
+            if not results:
+                await query.edit_message_text(
+                    f"❌ No songs found for {singer}."
+                )
+                return
+
+            message = f"🎵 *{singer} — Songs*\n\n"
+
+            for number, result in enumerate(results, start=1):
+
+                message += (
+                    f"{number}. *{result['song']}*\n"
+                    f"🎤 {result['artist']}\n"
+                    f"💿 {result['album']}\n"
+                    f"🔗 {result['link']}\n\n"
+                )
+
+            keyboard = [
+                [
+                    InlineKeyboardButton(
+                        "🎤 Singers",
+                        callback_data="popular_singers"
+                    ),
+                    InlineKeyboardButton(
+                        "🏠 Home",
+                        callback_data="home"
+                    )
+                ]
+            ]
+
+            await query.edit_message_text(
+                message,
+                reply_markup=InlineKeyboardMarkup(keyboard),
+                parse_mode="Markdown"
+            )
+
+        except Exception as error:
+
+            print("Singer search error:", error)
+
+            await query.edit_message_text(
+                "❌ Sorry, I couldn't load the songs right now."
+            )
 
     elif query.data == "search_music":
         await query.edit_message_text(
@@ -306,6 +377,47 @@ async def home_button(
             "🔎 Search for music\n"
             "🔥 Explore trending songs\n"
             "❤️ Save your favorite songs"
+        )
+    elif query.data == "home":
+
+        keyboard = [
+            [
+                InlineKeyboardButton(
+                    "🎤 Popular Singers",
+                    callback_data="popular_singers"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    "🔎 Search Music",
+                    callback_data="search_music"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    "🔥 Trending",
+                    callback_data="trending"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    "❤️ Favorites",
+                    callback_data="favorites"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    "ℹ️ Help",
+                    callback_data="help"
+                )
+            ]
+        ]
+
+        await query.edit_message_text(
+            "🎵 *Music Bot Home*\n\n"
+            "What would you like to do?",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+            parse_mode="Markdown"
         )
 conversation_handler = ConversationHandler(
 
