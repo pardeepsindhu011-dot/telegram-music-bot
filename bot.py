@@ -233,10 +233,53 @@ async def home_button(
     await query.answer()
 
     if query.data == "popular_singers":
-        await query.edit_message_text(
-            "🎤 Popular Singers\n\n"
-            "Coming next: singer selection 🎶"
-        )
+
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                "🇮🇳 Arijit Singh",
+                callback_data="singer_arijit"
+            ),
+            InlineKeyboardButton(
+                "🇮🇳 Dhanda Nyoli",
+                callback_data="singer_Dhanda"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "🇮🇳 KD ",
+                callback_data=" singer_KDharyanvi"
+            ),
+            InlineKeyboardButton(
+                "🇬🇧 Ed Sheeran",
+                callback_data="singer_ed"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "🇺🇸 The Weeknd",
+                callback_data="singer_weeknd"
+            ),
+            InlineKeyboardButton(
+                "🇺🇸 Bruno Mars",
+                callback_data="singer_bruno"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "🏠 Home",
+                callback_data="home"
+            )
+        ]
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await query.edit_message_text(
+        "🎤 *Choose a singer*",
+        reply_markup=reply_markup,
+        parse_mode="Markdown"
+    )
 
     elif query.data == "search_music":
         await query.edit_message_text(
